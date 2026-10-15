@@ -42,6 +42,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -49,7 +50,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # Tenant Isolation Middleware will be added here later
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -91,10 +91,15 @@ if DB_NAME:
         }
     }
 else:
+    # Use /tmp for SQLite on Vercel as it's the only writable directory
+    sqlite_path = BASE_DIR / 'db.sqlite3'
+    if os.getenv('VERCEL'):
+        sqlite_path = Path('/tmp') / 'db.sqlite3'
+
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': sqlite_path,
         }
     }
 

@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/languagecontext.tsx","./src/main.tsx","./src/components/layout.tsx","./src/pages/aiassistant.tsx","./src/pages/classroomsview.tsx","./src/pages/dashboard.tsx","./src/pages/groupsview.tsx","./src/pages/login.tsx","./src/pages/scheduleview.tsx","./src/pages/schedulewizard.tsx","./src/pages/teachersview.tsx"],"version":"5.9.3"}
