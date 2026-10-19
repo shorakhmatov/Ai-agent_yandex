@@ -7,12 +7,9 @@ import {
   AlertTriangle,
   Filter,
   Plus,
-  ChevronLeft,
-  ChevronRight,
   FileSpreadsheet,
   FileText,
   Calendar,
-  Layers
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -22,8 +19,8 @@ interface LessonCard {
   teacher: string;
   group: string;
   room: string;
-  day: number; // 1 to 6
-  slot: number; // 1 to 5
+  day: number;
+  slot: number;
   hasConflict?: boolean;
 }
 
@@ -58,7 +55,6 @@ export const ScheduleView: React.FC = () => {
     { number: 5, time: '15:45 - 17:15' },
   ];
 
-  // Демо-данные занятий для отображения в сетке
   const [lessons, setLessons] = useState<LessonCard[]>([
     { id: '1', subject: 'Высшая математика', teacher: 'Иванов А.А.', group: 'ИС-21', room: '101 (Лекц.)', day: 1, slot: 1 },
     { id: '2', subject: 'Физика', teacher: 'Смирнов В.П.', group: 'ИС-21', room: '204 (Лаб.)', day: 1, slot: 2 },
@@ -81,22 +77,25 @@ export const ScheduleView: React.FC = () => {
     : lessons.filter(l => l.group === selectedGroup);
 
   return (
-    <div className="space-y-6">
-      {/* Header with Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-slate-200">
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-900">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
               {language === 'uz' ? 'Dars jadvali: II Semestr 2026' : 'Учебное расписание: II Семестр 2026'}
             </h1>
             <span className={clsx(
               "px-3 py-1 rounded-full text-xs font-semibold",
-              isPublished ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+              isPublished ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400" : "bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-400"
             )}>
-              {isPublished ? (language === 'uz' ? 'Nashr qilingan' : 'Опубликовано') : (language === 'uz' ? 'Qoralama (Draft)' : 'Черновик')}
+              {isPublished
+                ? (language === 'uz' ? 'Nashr qilingan' : 'Опубликовано')
+                : (language === 'uz' ? 'Qoralama (Draft)' : 'Черновик')
+              }
             </span>
           </div>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             {language === 'uz'
               ? 'Oʻquv ishlari boʻyicha direktor oʻrinbosari kabineti'
               : 'Кабинет заместителя директора по учебной части'}
@@ -104,55 +103,56 @@ export const ScheduleView: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Версии расписания */}
-          <div className="flex items-center bg-slate-100 rounded-lg p-1 text-sm">
+          {/* Version selector */}
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 text-sm">
             <button
               onClick={() => setSelectedVersion('v1')}
-              className={clsx("px-3 py-1.5 rounded-md text-xs font-medium transition-all", selectedVersion === 'v1' ? "bg-white shadow text-slate-900" : "text-slate-600")}
+              className={clsx("px-3 py-1.5 rounded-lg text-xs font-medium transition-all", selectedVersion === 'v1' ? "bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-400")}
             >
-              Версия 1
+              V1
             </button>
             <button
               onClick={() => setSelectedVersion('v2')}
-              className={clsx("px-3 py-1.5 rounded-md text-xs font-medium transition-all", selectedVersion === 'v2' ? "bg-white shadow text-slate-900" : "text-slate-600")}
+              className={clsx("px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5", selectedVersion === 'v2' ? "bg-white dark:bg-slate-700 shadow text-slate-900 dark:text-white" : "text-slate-600 dark:text-slate-400")}
             >
-              Версия 2 (ИИ)
+              <Sparkles className="w-3 h-3" />
+              V2 AI
             </button>
           </div>
 
-          {/* Экспорт */}
+          {/* Export */}
           <div className="relative">
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
-              className="flex items-center gap-2 px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors"
+              className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-medium transition-colors"
             >
               <Download className="w-4 h-4 text-slate-500" />
               <span>{language === 'uz' ? 'Yuklab olish' : 'Экспорт'}</span>
             </button>
 
             {showExportMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-20 py-1 overflow-hidden">
-                <button onClick={() => handleExport('pdf')} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+              <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-20 py-1 overflow-hidden">
+                <button onClick={() => handleExport('pdf')} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2.5 transition-colors">
                   <FileText className="w-4 h-4 text-red-500" /> PDF Документ
                 </button>
-                <button onClick={() => handleExport('csv')} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                <button onClick={() => handleExport('csv')} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2.5 transition-colors">
                   <FileSpreadsheet className="w-4 h-4 text-emerald-600" /> Excel / CSV
                 </button>
-                <button onClick={() => handleExport('ics')} className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                <button onClick={() => handleExport('ics')} className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2.5 transition-colors">
                   <Calendar className="w-4 h-4 text-blue-500" /> Календарь (ICS)
                 </button>
               </div>
             )}
           </div>
 
-          {/* Публикация */}
+          {/* Publish */}
           <button
             onClick={() => setIsPublished(!isPublished)}
             className={clsx(
-              "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+              "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors",
               isPublished
-                ? "bg-slate-200 text-slate-700 hover:bg-slate-300"
-                : "bg-primary-600 text-white hover:bg-primary-700"
+                ? "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600"
+                : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20"
             )}
           >
             <CheckCircle className="w-4 h-4" />
@@ -163,18 +163,18 @@ export const ScheduleView: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter and View Bar */}
-      <div className="flex items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200">
+      {/* Filter bar */}
+      <div className="flex items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
             <Filter className="w-4 h-4 text-slate-400" />
-            <span>Группа:</span>
+            <span>{language === 'uz' ? 'Guruh:' : 'Группа:'}</span>
             <select
               value={selectedGroup}
               onChange={(e) => setSelectedGroup(e.target.value)}
-              className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+              className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white"
             >
-              <option value="all">Все группы</option>
+              <option value="all">{language === 'uz' ? 'Barchasi' : 'Все группы'}</option>
               <option value="ИС-21">ИС-21</option>
               <option value="ИС-22">ИС-22</option>
               <option value="ЭК-11">ЭК-11</option>
@@ -182,71 +182,81 @@ export const ScheduleView: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-slate-500">
-          <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" /> Без конфликтов
-          <span className="w-3 h-3 rounded-full bg-red-500 inline-block ml-3" /> Обнаружен конфликт
+        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+            {language === 'uz' ? 'Konflikt yoʻq' : 'Без конфликтов'}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" />
+            {language === 'uz' ? 'Konflikt mavjud' : 'Конфликт'}
+          </span>
         </div>
       </div>
 
-      {/* Schedule Calendar Grid */}
-      <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto shadow-sm">
-        <table className="w-full border-collapse min-w-[900px]">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-200">
-              <th className="p-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider w-36">
-                Время / Урок
-              </th>
-              {daysOfWeek.map(day => (
-                <th key={day.id} className="p-4 text-center text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                  {day.name}
+      {/* Schedule Grid */}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse min-w-[900px]">
+            <thead>
+              <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                <th className="p-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-40">
+                  {language === 'uz' ? 'Vaqt / Dars' : 'Время / Урок'}
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200">
-            {timeSlots.map(slot => (
-              <tr key={slot.number} className="hover:bg-slate-50/50 transition-colors">
-                <td className="p-4 border-r border-slate-200 bg-slate-50/30">
-                  <div className="font-bold text-slate-900 text-sm">Урок {slot.number}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">{slot.time}</div>
-                </td>
-                {daysOfWeek.map(day => {
-                  const lesson = filteredLessons.find(l => l.day === day.id && l.slot === slot.number);
-                  return (
-                    <td key={day.id} className="p-2 border-r border-slate-200 last:border-r-0 align-top h-28 w-1/6">
-                      {lesson ? (
-                        <div className={clsx(
-                          "h-full p-2.5 rounded-lg border text-left flex flex-col justify-between transition-all hover:shadow-md cursor-pointer",
-                          lesson.hasConflict
-                            ? "bg-red-50 border-red-200 text-red-900"
-                            : "bg-indigo-50/70 border-indigo-200 text-indigo-950"
-                        )}>
-                          <div>
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="font-bold text-xs line-clamp-1">{lesson.subject}</span>
-                              {lesson.hasConflict && (
-                                <AlertTriangle className="w-3.5 h-3.5 text-red-600 flex-shrink-0" />
-                              )}
-                            </div>
-                            <div className="text-[11px] text-slate-600 mt-1">{lesson.teacher}</div>
-                          </div>
-                          <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-indigo-100">
-                            <span className="font-semibold text-primary-700">{lesson.group}</span>
-                            <span className="bg-white/80 px-1.5 py-0.5 rounded border border-slate-200">{lesson.room}</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="h-full border border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-300 hover:border-slate-400 hover:text-slate-500 cursor-pointer transition-colors group">
-                          <Plus className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                      )}
-                    </td>
-                  );
-                })}
+                {daysOfWeek.map(day => (
+                  <th key={day.id} className="p-4 text-center text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    {day.name}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              {timeSlots.map(slot => (
+                <tr key={slot.number} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                  <td className="p-4 border-r border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+                    <div className="font-bold text-slate-900 dark:text-white text-sm">
+                      {language === 'uz' ? `${slot.number}-dars` : `Урок ${slot.number}`}
+                    </div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{slot.time}</div>
+                  </td>
+                  {daysOfWeek.map(day => {
+                    const lesson = filteredLessons.find(l => l.day === day.id && l.slot === slot.number);
+                    return (
+                      <td key={day.id} className="p-2 border-r border-slate-100 dark:border-slate-800 last:border-r-0 align-top h-28 w-1/6">
+                        {lesson ? (
+                          <div className={clsx(
+                            "h-full p-3 rounded-xl border text-left flex flex-col justify-between transition-all hover:shadow-md cursor-pointer",
+                            lesson.hasConflict
+                              ? "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900/50 text-red-900 dark:text-red-200"
+                              : "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900/50 text-blue-900 dark:text-blue-200"
+                          )}>
+                            <div>
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="font-bold text-xs line-clamp-1">{lesson.subject}</span>
+                                {lesson.hasConflict && (
+                                  <AlertTriangle className="w-3.5 h-3.5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                                )}
+                              </div>
+                              <div className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">{lesson.teacher}</div>
+                            </div>
+                            <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1.5 border-t border-current/10">
+                              <span className="font-semibold">{lesson.group}</span>
+                              <span className="px-1.5 py-0.5 rounded bg-white/80 dark:bg-slate-900/50 border border-current/20">{lesson.room}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="h-full border-2 border-dashed border-slate-200 dark:border-slate-700/50 rounded-xl flex items-center justify-center text-slate-300 dark:text-slate-600 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-500 dark:hover:text-slate-400 cursor-pointer transition-colors">
+                            <Plus className="w-4 h-4" />
+                          </div>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
